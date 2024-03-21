@@ -1,24 +1,21 @@
 'use client'
 
-import Models from "@/components/Models";
+import AuthModal from "@/components/AuthModal";
+import Models from "@/components/Modals";
 import { useEffect, useState } from "react"
 
 const ModelProvider=()=>{
     const [isMouted,setIsMounted]=useState(false);
     useEffect(()=>{
        setIsMounted(true);
-    })
+    },[])
     if(!isMouted){
-     return null;}
+     return null;
+    }
 
     return(
         <>
-        <Models
-          title="Models"
-          description="model description"
-           >
-          test childern
-        </Models>
+        <AuthModal/>
         </>
     )
 }
