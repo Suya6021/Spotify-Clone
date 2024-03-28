@@ -7,6 +7,7 @@ import { HiHome } from "react-icons/hi";
 import Box from "./Box";
 import SidebarItems from "./SidebarItems";
 import Library from "./Library";
+import { Toaster } from "./ui/toaster";
 
 interface SidebarProps {
     children: React.ReactNode;  
@@ -48,6 +49,7 @@ const Sidebar:React.FC<SidebarProps> = ({children}) => {
         <main className="h-full flex-1 overflow-y-auto py-2">
             {children}
         </main> 
+        <Toaster />
     </div>
   )
 }
