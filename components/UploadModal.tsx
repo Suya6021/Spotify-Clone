@@ -20,26 +20,18 @@ import { Input } from "@/components/ui/input";
 import { Toast } from "./ui/toast";
 import { useUser } from "@/hooks/useUser";
 import { toast } from "./ui/use-toast";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+
+import { useRouter } from "next/navigation";
+import { createClient } from "@/util/supabase/client";
+import { error } from "console";
 const formSchema = z.object({
   author: z.string().min(2).max(50),
   title: z.string().min(2).max(25),
-  song: z
-    .instanceof(FileList) // Ensure it's a FileList object
-    .refine((fileList) => fileList.length > 0, "A file is required") // Check for non-empty list
-    .refine(
-      (fileList) => fileList[0].size <= 1024 * 1024 * 5, // Limit file size (5MB)
-      "File size must be less than 5MB"
-    ),
-  image: z
-    .instanceof(FileList) // Ensure it's a FileList object
-    .refine((fileList) => fileList.length > 0, "A file is required") // Check for non-empty list
-    .refine(
-      (fileList) => fileList[0].size <= 1024 * 1024 * 5, // Limit file size (5MB)
-      "File size must be less than 5MB"
-    ),
+  song: z.any(),
+  image: z.any(),
 });
 const UploadModal = () => {
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -52,10 +44,9 @@ const UploadModal = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useUser();
   const uploadModal = useUploadModal();
-  const supabaseClient = useSupabaseClient();
+  const supabaseClient = createClient();
   const onChange = (open: boolean) => {
     if (!open) {
-      form.reset();
       uploadModal.onClose();
     }
   };
@@ -64,9 +55,9 @@ const UploadModal = () => {
     try {
       console.log(values);
       setIsLoading(true);
-      const imageFile = values.image?.[0];
-      const songFile = values.song?.[0];
-      if (!imageFile && !songFile && !user) {
+      const imageFile = values.image;
+      const songFile = values.song;
+      if (!imageFile && !songFile && !user!) {
         toast({
           variant: "destructive",
           title: "Fill up the empty Fields",
@@ -84,6 +75,7 @@ const UploadModal = () => {
           upsert: false,
         });
       if (SongError) {
+        console.log(SongError);
         setIsLoading(false);
         return toast({
           variant: "destructive",
@@ -107,15 +99,30 @@ const UploadModal = () => {
         });
       }
 
-      const { error: supabaseError } = await supabaseClient.from("songs")
+      const { error: supabaseError } = await supabaseClient
+        .from("songs")
         .insert({
-          user_id:user.id,
-          title:values.title,
-          author:values.author,
-          image_path:imageData.path,
-          song_path:songData.path,
-
+          user_id: user?.id,
+          title: values.title,
+          author: values.author,
+          image_path: imageData.path,
+          song_path: songData.path,
         });
+      if (supabaseError) {
+        setIsLoading(false);
+        return toast({
+          variant: "destructive",
+          title: "Failed to Upload the image",
+        });
+      }
+
+      router.refresh();
+      setIsLoading(false);
+      toast({
+        title: "Song added to Database",
+      });
+      form.reset();
+      uploadModal.onClose();
     } catch (error) {
       toast({
         title: "Something Went Wrong!",

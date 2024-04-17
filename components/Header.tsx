@@ -12,6 +12,7 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useUser } from "@/hooks/useUser";
 import { FaUserAlt } from "react-icons/fa";
 import { useToast } from "./ui/use-toast";
+import { createClient } from "@/util/supabase/client";
 
 interface HeaderProps {
   children: React.ReactNode;
@@ -22,7 +23,7 @@ const Header: React.FC<HeaderProps> = ({ children, className }) => {
   const authModal = useAuthModel();
   const { user } = useUser();
   const {toast} = useToast();
-  const supabaseClient = useSupabaseClient();
+  const supabaseClient = createClient();
   const handleLogout = async () => {
     const { error } = await supabaseClient.auth.signOut();
     router.refresh();

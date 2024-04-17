@@ -1,27 +1,50 @@
 "use client";
 
-import {
-  useSessionContext,
-  useSupabaseClient,
-} from "@supabase/auth-helpers-react";
 import Modals from "./Modals";
 import { useRouter } from "next/navigation";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import useAuthModel from "@/hooks/useAuthModel";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { createClient } from "@/util/supabase/client";
+import { User } from "@supabase/supabase-js";
 const AuthModal = () => {
-  const supabaseClient = useSupabaseClient();
+  const supabase=createClient();
   const router = useRouter();
-  const { session } = useSessionContext();
+ 
   const { onClose, isOpen } = useAuthModel();
-  
-  useEffect(() => {
-    if (session) {
+  const [user, setUser] = useState<User | null>(null);
+
+// useEffect(() => {
+//   const fetchUser = async () => {
+//     const {data} = await supabase.auth.onAuthStateChange();
+//     console.log(data)
+//     setUser(userResponse.data.user);
+    
+//   };
+
+//   fetchUser();
+// }, []);
+//   useEffect(() => {
+//     if (user) {
+//       router.refresh();
+//       onClose();
+//     }
+//   }, [user, router, onClose]);
+
+const { data } = supabase.auth.onAuthStateChange((event, session) => {
+  console.log(event, session)
+
+  if (event === 'INITIAL_SESSION') {
+    // handle initial session
+  } else if (event === 'SIGNED_IN') {
       router.refresh();
       onClose();
-    }
-  }, [session, router, onClose]);
+      console.log(data)
+  } else if (event === 'SIGNED_OUT') {
+    // handle sign out event
+  } 
+})
 
   const onChange = (open: boolean) => {
     if (!open) {
@@ -37,7 +60,7 @@ const AuthModal = () => {
       onChange={onChange}
     >
       <Auth
-        supabaseClient={supabaseClient}
+        supabaseClient={supabase}
         theme="dark"
         providers={["github"]}
         magicLink
