@@ -8,7 +8,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 //   User
 // } from "@supabase/auth-helpers-react";
 import { createClient } from "@/util/supabase/client";
-import { Session } from "inspector";
+
 import { User } from "@supabase/supabase-js";
 
 type UserContextType = {

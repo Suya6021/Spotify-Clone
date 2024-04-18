@@ -54,8 +54,8 @@ const { data } = supabase.auth.onAuthStateChange((event, session) => {
 
   return (
     <Modals
-      title="Test Model"
-      description="test description"
+      title="Log in "
+      description="Enter your credientails"
       isOpen={isOpen}
       onChange={onChange}
     >

@@ -1,8 +1,9 @@
 import Header from '@/components/Header'
 import ListItems from '@/components/ListItems'
 import React from 'react'
-
+export const revalidate = 0;
 const Index = () => {
+
   return (
     <div className='bg-neutral-900 rounded-lg h-full w-full overflow-hidden overflow-y-auto '>
      <Header >

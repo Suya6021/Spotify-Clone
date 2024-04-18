@@ -3,60 +3,64 @@ import uniqid from "uniqid";
 import React, { useState } from "react";
 import Modals from "./Modals";
 import useUploadModal from "@/hooks/useUploadModal";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { FieldValue, useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
+
 import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Toast } from "./ui/toast";
+  FieldValue,
+  FieldValues,
+  SubmitHandler,
+  useForm,
+} from "react-hook-form";
+import { Button } from "@/components/ui/button";
+
 import { useUser } from "@/hooks/useUser";
 import { toast } from "./ui/use-toast";
 
 import { useRouter } from "next/navigation";
 import { createClient } from "@/util/supabase/client";
-import { error } from "console";
-const formSchema = z.object({
-  author: z.string().min(2).max(50),
-  title: z.string().min(2).max(25),
-  song: z.any(),
-  image: z.any(),
-});
+import Input from "./Input";
+
+// const formSchema = z.object({
+//   author: z.string().min(2).max(50),
+//   title: z.string().min(2).max(25),
+//   song: z.any(),
+//   image: z.any(),
+// });
 const UploadModal = () => {
   const router = useRouter();
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      author: "",
-      title: "",
-      song: undefined,
-      image: undefined,
-    },
-  });
+  // const form = useForm<z.infer<typeof formSchema>>({
+  //   resolver: zodResolver(formSchema),
+  //   defaultValues: {
+  //     author: "",
+  //     title: "",
+  //     song: undefined,
+  //     image: undefined,
+  //   },
+  // });
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useUser();
   const uploadModal = useUploadModal();
   const supabaseClient = createClient();
+  const { register, handleSubmit, reset } = useForm<FieldValues>({
+    defaultValues: {
+      author: "",
+      title: "",
+      song: null,
+      image: null,
+    },
+  });
   const onChange = (open: boolean) => {
     if (!open) {
       uploadModal.onClose();
     }
   };
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  const onSubmit: SubmitHandler<FieldValues> = async (values) => {
     try {
       console.log(values);
       setIsLoading(true);
-      const imageFile = values.image;
-      const songFile = values.song;
+      const imageFile = values.image?.[0];
+      const songFile = values.song?.[0];
+
       if (!imageFile && !songFile && !user!) {
         toast({
           variant: "destructive",
@@ -121,7 +125,7 @@ const UploadModal = () => {
       toast({
         title: "Song added to Database",
       });
-      form.reset();
+      reset();
       uploadModal.onClose();
     } catch (error) {
       toast({
@@ -131,7 +135,7 @@ const UploadModal = () => {
     } finally {
       setIsLoading(false);
     }
-  }
+  };
   return (
     <div>
       <Modals
@@ -140,7 +144,7 @@ const UploadModal = () => {
         isOpen={uploadModal.isOpen}
         onChange={onChange}
       >
-        <Form {...form}>
+        {/* <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <FormField
               control={form.control}
@@ -188,7 +192,7 @@ const UploadModal = () => {
                       type="file"
                       accept=".mp3"
                       disabled={isLoading}
-                      {...{ ...field, value: undefined }}
+                      { ...field}
                     />
                   </FormControl>
 
@@ -208,7 +212,7 @@ const UploadModal = () => {
                       type="file"
                       accept="image/*"
                       disabled={isLoading}
-                      {...{ ...field, value: undefined }}
+                      { ...field}
                     />
                   </FormControl>
 
@@ -218,7 +222,50 @@ const UploadModal = () => {
             />
             <Button type="submit">Submit</Button>
           </form>
-        </Form>
+        </Form> */}
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col gap-y-4"
+        >
+          <Input
+            id="title"
+            disabled={isLoading}
+            {...register("title", { required: true })}
+            placeholder="Song Title"
+          />
+          <Input
+            id="author"
+            disabled={isLoading}
+            {...register("author", { required: true })}
+            placeholder="Author"
+          />
+          <div>
+            <div className="pb-1">select a song file</div>
+            <Input
+              id="song"
+              type="file"
+              disabled={isLoading}
+              accept=".mp3"
+              {...register("song", { required: true })}
+            />
+          </div>
+          <div>
+          <div className="pb-1">
+            select a Image file
+          </div>
+          <Input
+         id='image'
+         type='file'
+         disabled={isLoading}
+         accept="image/*"
+         {...register('image',{required:true})}
+         />
+         
+         </div>
+         <Button disabled={isLoading} type='submit'>
+           Create
+         </Button>
+        </form>
       </Modals>
     </div>
   );
