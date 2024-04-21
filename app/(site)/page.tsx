@@ -1,9 +1,11 @@
+import getSongs from '@/action/getSongs';
 import Header from '@/components/Header'
 import ListItems from '@/components/ListItems'
 import React from 'react'
+import PageContent from './components/PageContent';
 export const revalidate = 0;
-const Index = () => {
-
+const Index = async() => {
+  const songs=await getSongs();
   return (
     <div className='bg-neutral-900 rounded-lg h-full w-full overflow-hidden overflow-y-auto '>
      <Header >
@@ -16,15 +18,13 @@ const Index = () => {
           </div>
         </div>
       </Header>
-      <div className='mt-2 mb-7 px-6'>
+      <div className='mt-2 mb-7 px-6 flex flex-col' >
         <div className='flex justify-between items-center'>
           <h1 className='text-white text-2xl font-semibold'>
              Newest songs
           </h1>
         </div>
-        <div>
-          List of Songs!
-        </div>
+        <PageContent songs={songs}/>
       </div>
       
     </div>
