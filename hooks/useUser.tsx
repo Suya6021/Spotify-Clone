@@ -27,7 +27,7 @@ export interface Props {
   [propsName: string]: any;
 }
 
-export const MyUserContextProvider = (props: Props) => {
+export const MyUserContextProvider =(props: Props) => {
   // const {
   //   session,
   //   isLoading: isLoadingUser,
@@ -43,8 +43,14 @@ export const MyUserContextProvider = (props: Props) => {
   const [subscription, setSubcription] = useState<Subscription | null>(null);
   const { data } = supabase.auth.onAuthStateChange((event, Session) => {
     if (event === "INITIAL_SESSION") {
-    } else if (event === "SIGNED_IN") {
-      setUser(Session?.user ?? null);
+
+    }
+     else if (event === "SIGNED_IN") {
+      if(user==null){
+       supabase.auth.getUser().then(userResponse => {
+        setUser(userResponse.data.user)
+      
+      });}
       setAccess_token(Session?.access_token ?? null);
     } else if (event === "SIGNED_OUT") {
       setUser(null);
@@ -79,7 +85,7 @@ export const MyUserContextProvider = (props: Props) => {
           const userDetailsPromise = results[0];
           const userSubscriptionPromise = results[1];
           if (userDetailsPromise.status === "fulfilled") {
-            console.log(userDetailsPromise.value);
+            
             setUserDeatils(userDetailsPromise.value as UserDetails);
           }
           if (userSubscriptionPromise.status === "fulfilled") {
@@ -101,7 +107,7 @@ export const MyUserContextProvider = (props: Props) => {
     isLoading: isLoading,
     subscription,
   };
-  console.log(value);
+ 
 
   return <UserContext.Provider value={value} {...props} />;
 };
