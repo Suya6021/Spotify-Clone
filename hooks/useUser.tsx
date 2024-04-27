@@ -41,21 +41,63 @@ export const MyUserContextProvider =(props: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [userDetails, setUserDeatils] = useState<UserDetails | null>(null);
   const [subscription, setSubcription] = useState<Subscription | null>(null);
-  const { data } = supabase.auth.onAuthStateChange((event, Session) => {
-    if (event === "INITIAL_SESSION") {
+ 
+  // const { data } = supabase.auth.onAuthStateChange((event, Session) => {
+  //   if (event === "INITIAL_SESSION") {
 
-    }
-     else if (event === "SIGNED_IN") {
-      if(user==null){
-       supabase.auth.getUser().then(userResponse => {
-        setUser(userResponse.data.user)
+  //   }
+  //    else if (event === "SIGNED_IN") {
+  //     if(user==null){
+  //      supabase.auth.getUser().then(userResponse => {
+  //       setUser(userResponse.data.user)
       
-      });}
-      setAccess_token(Session?.access_token ?? null);
-    } else if (event === "SIGNED_OUT") {
-      setUser(null);
-    }
-  });
+  //     });}
+  //     setAccess_token(Session?.access_token ?? null);
+  //   } else if (event === "SIGNED_OUT") {
+  //     setUser(null);
+  //   }
+  // });
+//   useEffect(()=>{
+//     async function  getUser(){
+//     const {data,error}=await supabase.auth.getUser();
+//     if(data){
+//   setUser(data.user);
+// }
+//  else if (!data){
+//   setUser(null);
+//  }
+// }
+//   getUser();
+// },[])
+const [authState, setAuthState] = useState(false);
+
+useEffect(() => {
+  const {data:{subscription}} = supabase.auth.onAuthStateChange(
+    (event, session) => {
+      if (event === 'SIGNED_OUT') {
+        setUser(null);
+      } else if (session) {
+         setUser(session.user);
+      }
+    })
+
+  return () => {
+    subscription.unsubscribe()
+  }
+}, [ ]);
+
+// useEffect(() => {
+//   async function getUser() {
+//     const { data, error } = await supabase.auth.getUser();
+//     if (data) {
+//       // Your code here
+//     }
+//   }
+
+//   if (authState) {
+//     getUser();
+//   }
+// }, []);
 
   const getUserDetails = async () => {
     const { data, error } = await supabase.from("users").select("*").single();
@@ -98,6 +140,7 @@ export const MyUserContextProvider =(props: Props) => {
       setUserDeatils(null);
       setSubcription(null);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, isLoading]);
 
   const value = {

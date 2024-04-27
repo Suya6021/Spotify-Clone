@@ -9,7 +9,7 @@ const getSongs = async():Promise<Song[]> => {
   if(error){
      console.log(error)
   }
-  console.log(data)
+  
   return data|| [];
 };
 

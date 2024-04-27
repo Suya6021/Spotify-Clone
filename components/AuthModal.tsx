@@ -32,20 +32,34 @@ const AuthModal = () => {
 //     }
 //   }, [user, router, onClose]);
 
-const { data } = supabase.auth.onAuthStateChange((event, session) => {
-  console.log(event, session)
+// const { data } = supabase.auth.onAuthStateChange((event, session) => {
+//   console.log(event, session)
 
-  if (event === 'INITIAL_SESSION') {
-    // handle initial session
-  } else if (event === 'SIGNED_IN') {
-      router.refresh();
-      onClose();
-      console.log(data)
-  } else if (event === 'SIGNED_OUT') {
-    // handle sign out event
-  } 
-})
+//   if (event === 'INITIAL_SESSION') {
+//     // handle initial session
+//   } else if (event === 'SIGNED_IN') {
+//       router.refresh();
+//       onClose();
+//       console.log(data)
+//   } else if (event === 'SIGNED_OUT') {
+//     // handle sign out event
+//   } 
+// })
+useEffect(()=>{
+  const getAuthState=async()=>{
+    const data=await supabase.auth.getUser();
+   if(data){
+    setUser(data.data.user)
+    router.refresh();
+    onClose();
+    console.log(data);
 
+   }}
+   
+   getAuthState();
+},[])
+
+  
   const onChange = (open: boolean) => {
     if (!open) {
       onClose();

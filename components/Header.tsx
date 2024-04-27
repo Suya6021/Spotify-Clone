@@ -8,7 +8,7 @@ import { RxCaretLeft, RxCaretRight } from "react-icons/rx";
 import { twJoin, twMerge } from "tailwind-merge";
 import Button from "./Button";
 import useAuthModel from "@/hooks/useAuthModel";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+
 import { useUser } from "@/hooks/useUser";
 import { FaUserAlt } from "react-icons/fa";
 import { useToast } from "./ui/use-toast";
@@ -66,10 +66,12 @@ const Header: React.FC<HeaderProps> = ({ children, className }) => {
           </button>
         </div>
         <div className="flex md:hidden gap-x-2 items-center">
-          <button className="rounded-full p-2  bg-white flex item-center justify-center hover:opacity-75 transition">
+          <button className="rounded-full p-2  bg-white flex item-center justify-center hover:opacity-75 transition"
+          onClick={()=>{router.push('/')}}>
             <HiHome className="text-black " size={20} />
           </button>
-          <button className="rounded-full p-2  bg-white flex item-center justify-center hover:opacity-75 transition">
+          <button className="rounded-full p-2  bg-white flex item-center justify-center hover:opacity-75 transition"
+           onClick={()=>{router.push('/search')}}>
             <BiSearch className="text-black " size={20} />
           </button>
         </div>
