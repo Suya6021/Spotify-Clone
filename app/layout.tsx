@@ -6,7 +6,7 @@ import Sidebar from "@/components/Sidebar";
 import UserProvider from "@/providers/UserProvider";
 import ModelProvider from "@/providers/ModelProvider";
 import getSongsByUserID from "@/action/getSongsByUserID";
-
+import Player from "@/components/Player";
 
 const font = Figtree({ subsets: ["latin"] });
 
@@ -14,22 +14,23 @@ export const metadata: Metadata = {
   title: "Spotify-Clone",
   description: "Listen to your favorite music for free",
 };
-export const revalidate=0;
+export const revalidate = 0;
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const UserSong=await getSongsByUserID();
+  const UserSong = await getSongsByUserID();
   return (
     <html lang="en">
       <body className={font.className}>
-       
-          <UserProvider>
-            <ModelProvider />
-            <Sidebar songs={UserSong}>{children}</Sidebar>
-          </UserProvider>
-        
+        <UserProvider>
+          <ModelProvider />
+          <Sidebar songs={UserSong}>
+            {children}
+          </Sidebar>
+          <Player/>
+        </UserProvider>
       </body>
     </html>
   );
