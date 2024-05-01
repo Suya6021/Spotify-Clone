@@ -2,7 +2,7 @@
 
 import LikeButton from "@/components/LikeButton";
 import MediaItem from "@/components/MediaItem";
-import useOnPlay from "@/hooks/UseOnPlay";
+import useOnPlay from "@/hooks/useOnPlay";
 import { Song } from "@/types/types"
 
 interface SearchContentProps{
